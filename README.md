@@ -17,7 +17,7 @@ I built this project end-to-end, focusing on:
 
 ---
 
-## ⚙ Technical Execution  
+##  Technical Execution  
 1. **Data Collection**  
    - Gathered datasets from **CosIng EU database, EWG Skin Deep, and Kaggle cosmetic ingredients**.  
    - Compiled a **knowledge base** with ingredient names, synonyms, toxicity levels, and safety rationales.  

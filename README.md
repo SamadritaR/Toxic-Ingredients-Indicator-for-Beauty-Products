@@ -98,12 +98,6 @@ I built this project end-to-end, focusing on:
 - [ ] Add user feedback loop for retraining  
 
 ---
-
-##  Screenshots (to add later)  
-- Input/Output example  
-- Product risk score meter  
-- Tooltip explanations  
-
 ---
 
 ## Disclaimer

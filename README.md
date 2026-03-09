@@ -1,9 +1,8 @@
-#  Toxic Ingredients Indicator for Beauty Products  
+#Toxic Ingredients Indicator for Beauty Products
 
-An **AI-powered Streamlit application** that identifies toxic or harmful ingredients in skincare and beauty products.  
-Users can paste an ingredient list into the app, and it will instantly flag risky compounds, provide safety explanations, and generate an overall product safety score.  
+A Streamlit app that scans beauty product labels — by photo, text, or paste — and tells you exactly what's in them, what the risks are, and where those risks are documented.
 
-This project demonstrates the **intersection of AI/ML, NLP, and product management** — from building the model pipeline to designing PRDs and testing usability with real users.  
+No more Googling ingredient names one by one. No more trusting that "dermatologist tested" means anything. You upload a photo of the back of your moisturiser, the app reads the label, cross-references every ingredient against a curated database of 700+ compounds, and flags anything worth knowing about — with the actual regulatory sources to back it up.
 
 ---
 
@@ -15,89 +14,137 @@ I built this project end-to-end, focusing on:
 - Conducting **usability testing with peers** to validate the user experience.  
 - Deploying the working prototype on **Streamlit** for easy accessibility.  
 
----
-
-##  Technical Execution  
-1. **Data Collection**  
-   - Gathered datasets from **CosIng EU database, EWG Skin Deep, and Kaggle cosmetic ingredients**.  
-   - Compiled a **knowledge base** with ingredient names, synonyms, toxicity levels, and safety rationales.  
-
-2. **Data Labeling**  
-   - Classified ingredients as **High Concern, Moderate Concern, or Safe** using FDA + EWG guidelines.  
-
-3. **Model Training**  
-   - **Baseline:** Logistic Regression + TF-IDF (with spaCy tokenization).  
-   - **Advanced:** Transformer models (BERT, DistilBERT) for improved classification of complex multi-word compounds.  
-   - Achieved an **F1-score of ~0.88** with the hybrid transformer-based approach.  
-
-4. **Prototype Deployment**  
-   - Built a **Streamlit app** with:  
-     - Text input box for ingredient lists.  
-     - Highlighting of toxic terms in **red**.  
-     - Tooltip explanations with sources.  
-     - An **overall product risk meter** (Safe → High Risk).  
+This started as a personal frustration — trying to decode ingredient lists on skincare products and realising there was no quick way to do it without a biochemistry degree or 45 minutes of searching. The app is my attempt to make that information accessible in under 30 seconds.
 
 ---
 
-##  Product Workflow  
-- Drafted a **PRD** defining MVP features:  
-  - Ingredient parsing + toxicity flagging.  
-  - Risk categorization tooltips.  
-  - Overall product toxicity score.  
-- Applied **MoSCoW prioritization**:  
-  - Must-have → flagging toxic ingredients.  
-  - Should-have → product safety meter.  
-  - Could-have → safer alternatives suggestion.  
-- Defined **personas**: skincare enthusiasts, dermatologists, regulators.  
+## What it actually does
+
+**Three ways to scan a product:**
+
+- **Search** — type any ingredient name, abbreviation, or CAS number. Partial matches work — type "paraben" and you'll see all of them.
+- **Upload a photo** — take a picture of the ingredients list on your product. The app has a built-in crop tool so you can isolate just the ingredients panel, and a full OCR pipeline that handles dark backgrounds, curved labels, low resolution, and awkward angles.
+- **Paste text** — copy an ingredients list from a brand website or anywhere else, paste it in, and get an analysis instantly.
+
+**What you get back for each flagged ingredient:**
+
+- A risk level — High, Medium, or Low — based on severity scores from regulatory bodies
+- What the hazard actually is, explained in plain English (endocrine disruption, carcinogenicity, contact sensitisation, etc.)
+- Which chemical family it belongs to (parabens, phthalates, cyclic siloxanes, fragrance allergens, PFAS, etc.)
+- The specific regulatory sources that flagged it — EU Cosmetics Regulation, SCCS opinions, IARC classifications, FDA guidance, California AB 2762, ECHA dossiers — with links
 
 ---
 
-##  Data-Driven Decision Making  
-- **Evaluation metrics:** Precision, Recall, F1-score.  
-- Prioritized **recall for High Concern** class (false negatives too costly).  
-- **Error analysis:** Discovered misclassification of some natural extracts → retrained model with balanced samples.  
-- Iteratively improved thresholds → final model achieved **F1-score ~0.88**.  
+## The database
+
+This is the part I spent the most time on. The app is only as useful as what it knows about.
+
+The database covers 1000+ cosmetic ingredients across 30+ categories:
+
+| Category | Examples |
+|---|---|
+| Parabens | methylparaben, butylparaben, propylparaben |
+| Phthalates | DBP, DEHP, DEP, BBP — all 10 common ones |
+| PFAS | PFOA, PFOS, perfluorodecalin, 20+ fluorinated compounds |
+| Cyclic siloxanes | D4, D5, D6 — EU-restricted in rinse-off products |
+| Formaldehyde donors | DMDM hydantoin, quaternium-15, diazolidinyl urea, bronopol |
+| Fragrance allergens | 82 EU-listed allergens including lilial (now banned), oakmoss, galaxolide |
+| UV filters | oxybenzone, octinoxate, avobenzone, homosalate, octocrylene, and 15+ others |
+| Hair dyes | PPD, resorcinol, disperse dyes, banned oxidative dyes |
+| Heavy metals | lead, mercury, arsenic, cadmium, chromium VI, nickel |
+| Preservatives | phenoxyethanol, isothiazolinones, IPBC, chlorphenesin, all parabens |
+| Retinoids | retinol, retinyl palmitate, retinaldehyde (EU 2022 restrictions) |
+| Exfoliants/AHAs | glycolic acid, lactic acid, malic acid, salicylic acid |
+| Essential oils | 40+ oils flagged for allergens, phototoxicity, or EU restrictions |
+| Surfactants | SLS, SLES, CAPB, ALS, cocamide DEA |
+| Ethoxylated/PEG | 50+ PEG variants, all flagged for 1,4-dioxane contamination risk |
+| Skin lighteners | hydroquinone (banned EU), kojic acid, arbutin, deoxyarbutin |
+| Antioxidants | BHA (IARC 2B), BHT, TBHQ |
+| Silicones | dimethicone, phenyl trimethicone, cyclomethicone |
+| Nail care | MMA (banned), toluene sulfonamide resin, camphor |
+| Oral care | fluoride limits, chlorhexidine, hydrogen peroxide concentrations |
+
+Each entry has a severity score (1–5), a hazard category, an evidence level, and at least one regulatory source. The database draws from 20 sources including EU Annexes II/III/V/VI, SCCS opinions, IARC monographs, ECHA dossiers, FDA guidance, California AB 2762, OEHHA Prop 65, and the CSC Red List.
+
+The search uses SQLite FTS5 with prefix indexing, so "SLES", "sodium laureth", and "laureth sulfate" all find the same thing. There's also a LIKE fallback for anything FTS misses.
 
 ---
 
-##  User-Centric Development  
-- Conducted peer usability testing (n=10).  
-- **Feedback:**  
-  - “List is helpful, but I want a quick overall score.”  
-- **Iteration:**  
-  - Added **Product Risk Score Meter** (visual gauge).  
-- **Result:**  
-  - Reduced average evaluation time from **5 minutes of web searches → <30 seconds in the app**.  
+## The OCR pipeline
+
+Getting readable text out of a phone photo of a cosmetic label is harder than it sounds. Labels have:
+- Tiny font, often 6–8pt
+- Curved surfaces (tubes, bottles)
+- Dark or metallic backgrounds
+- Poor lighting or shadows
+- Multiple text blocks at different angles
+
+The app runs two OCR paths depending on the image:
+
+**Fast path** — for clean, well-lit, high-resolution images. Skips preprocessing entirely and runs Tesseract directly. Heavy preprocessing on already-good images makes things worse, so this path avoids it.
+
+**Heavy path** — for everything else. Steps: upscale to ~2000px tall, auto-deskew using minAreaRect rotation detection, CLAHE contrast normalisation, NLMeans denoising, Gaussian sharpening, then binarisation via three variants (Otsu, adaptive Gaussian at two block sizes, morphological cleanup). Each variant is run at multiple Tesseract PSM modes (4, 6, 11). The best result is picked by a scoring function that weighs both OCR confidence and word count.
+
+There's also a crop tool built in canvas so you can draw a box around just the ingredients section before running OCR — this alone makes a big difference on cluttered labels.
 
 ---
 
-##  Key Features  
-- Paste ingredient list → get instant **toxicity analysis**.  
-- **Highlighting & Tooltips** → clear explanations for each flagged ingredient.  
-- **Overall Safety Score** → product-level risk assessment.  
-- **Source-Backed Transparency** → FDA, EU CosIng, EWG references.  
-- Simple, intuitive UI built with **Streamlit**.  
+## Tech stack
+
+| Layer | What's used |
+|---|---|
+| App framework | Streamlit |
+| Database | SQLite with FTS5 (full-text search with prefix indexing) |
+| OCR | Tesseract via pytesseract |
+| Image processing | OpenCV, Pillow |
+| PDF support | pdf2image + Poppler |
+| Language | Python 3.11+ |
+
+No ML model. No API calls. No internet connection required once set up. Everything runs locally.
 
 ---
 
-##  Tech Stack  
-- **Languages/Frameworks:** Python, Streamlit, Flask (optional backend)  
-- **ML/NLP:** scikit-learn, spaCy, transformers (BERT, DistilBERT)  
-- **Data:** FDA, EU CosIng, EWG Skin Deep, Kaggle datasets  
-- **Deployment:** Docker, Heroku/AWS (planned)  
+## Running it
+
+**Requirements:**
+- Python 3.11+
+- Tesseract installed on your system (`brew install tesseract` on Mac, `apt install tesseract-ocr` on Linux)
+- Poppler for PDF support (`brew install poppler` / `apt install poppler-utils`)
+
+```bash
+# Clone the repo
+git clone https://github.com/SamadritaR/Toxic-Ingredients-Indicator-for-Beauty-Products.git
+cd Toxic-Ingredients-Indicator-for-Beauty-Products
+
+# Install Python dependencies
+pip install streamlit pytesseract Pillow opencv-python pdf2image numpy
+
+# Run
+streamlit run app.py
+```
+
+The database file `toxic.db` needs to be in the parent directory of `app.py`, or update the `DB_PATH` variable at the top of the file to point to wherever you put it.
 
 ---
 
-##  Roadmap  
-- [x] MVP with rules-based KB matching  
-- [x] ML pipeline (Logistic Regression + TF-IDF)  
-- [x] Transformer integration (DistilBERT)  
-- [x] Streamlit interface with highlights + tooltips  
-- [ ] Suggest safer ingredient alternatives  
-- [ ] Deploy cloud version with Docker/Heroku  
-- [ ] Add user feedback loop for retraining  
+## What's next
+
+A few things on the list:
+
+- **Safer alternatives** — when something is flagged, suggest what to look for instead
+- **Full product scoring** — aggregate all flagged ingredients into one overall safety score with breakdown
+- **Mobile upload improvements** — better handling of portrait-orientation phone photos
+- **Ingredient list parsing improvements** — smarter handling of parenthetical INCI names and manufacturer abbreviations
+- **Cloud deployment** — hosted version so you don't need to run it locally
 
 ---
+
+## Limitations
+
+The database is built from publicly available regulatory sources and is not exhaustive. New ingredients enter the market faster than any database can track them. An ingredient not flagged by this app doesn't mean it's necessarily safe — it may just not be in the database yet.
+
+This is a personal research tool, not a substitute for medical or dermatological advice. If you have a specific skin condition or allergy, talk to a doctor.
+
 ---
 
 ## Disclaimer

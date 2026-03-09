@@ -1,4 +1,4 @@
-#Toxic Ingredients Indicator for Beauty Products
+# Toxic Ingredients Indicator for Beauty Products
 
 A Streamlit app that scans beauty product labels — by photo, text, or paste — and tells you exactly what's in them, what the risks are, and where those risks are documented.
 

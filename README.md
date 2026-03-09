@@ -6,15 +6,27 @@ No more Googling ingredient names one by one. No more trusting that "dermatologi
 
 ---
 
-##  My Role  
-I built this project end-to-end, focusing on:  
-- Designing the **NLP pipeline** to parse ingredient lists.  
-- Creating structured **product requirement documents (PRDs)** to guide development.  
-- Defining **personas and prioritization (MoSCoW)** for roadmap planning.  
-- Conducting **usability testing with peers** to validate the user experience.  
-- Deploying the working prototype on **Streamlit** for easy accessibility.  
+## My Role
 
-This started as a personal frustration — trying to decode ingredient lists on skincare products and realising there was no quick way to do it without a biochemistry degree or 45 minutes of searching. The app is my attempt to make that information accessible in under 30 seconds.
+I built this end-to-end, from the database to the interface to the OCR pipeline.
+
+**Ingredient Database**
+- Researched and compiled 700+ cosmetic ingredients across 30+ categories
+- Cross-referenced EU Annexes II/III/V/VI, SCCS opinions, IARC classifications, FDA guidance, California AB 2762, ECHA dossiers, and 14 other regulatory sources
+- Every entry has a severity score (1–5), hazard category, evidence level, and source link — nothing auto-generated, each ingredient manually verified
+
+**OCR Pipeline**
+- Built two processing paths — fast path for clean/high-res images, heavy path for dark backgrounds, curved labels, low resolution, and awkward angles
+- Heavy path includes: upscaling, auto-deskew, CLAHE contrast normalisation, NLMeans denoising, Gaussian sharpening, three binarisation variants, and multi-PSM Tesseract runs
+- Scoring function picks the best result across all variants automatically
+
+**App & Search**
+- Built a canvas-based crop tool so users can isolate just the ingredients panel before OCR
+- Implemented FTS5 full-text search with prefix indexing — partial matches work, so "paraben" finds all parabens
+- Designed risk scoring, result cards, and hazard explanations pulled directly from the database
+
+**Stack**
+- Python, Streamlit, SQLite (FTS5), OpenCV, Tesseract, Pillow
 
 ---
 
@@ -34,6 +46,7 @@ This started as a personal frustration — trying to decode ingredient lists on 
 - The specific regulatory sources that flagged it — EU Cosmetics Regulation, SCCS opinions, IARC classifications, FDA guidance, California AB 2762, ECHA dossiers — with links
 
 ---
+https://github.com/user-attachments/assets/907a9fe8-6f17-4d80-87cc-e92a206aad08
 
 ## The database
 

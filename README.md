@@ -1,166 +1,169 @@
-# Toxic Ingredients Indicator for Beauty Products
+# 🧪 Toxic Ingredients Indicator
 
-A Streamlit app that scans beauty product labels — by photo, text, or paste — and tells you exactly what's in them, what the risks are, and where those risks are documented.
+**Scan a cosmetic label. Know what's in it. In plain English.**
 
-No more Googling ingredient names one by one. No more trusting that "dermatologist tested" means anything. You upload a photo of the back of your moisturiser, the app reads the label, cross-references every ingredient against a curated database of 700+ compounds, and flags anything worth knowing about — with the actual regulatory sources to back it up.
-
----
-
-## My Role
-
-I built this end-to-end, from the database to the interface to the OCR pipeline.
-
-**Ingredient Database**
-- Researched and compiled 700+ cosmetic ingredients across 30+ categories
-- Cross-referenced EU Annexes II/III/V/VI, SCCS opinions, IARC classifications, FDA guidance, California AB 2762, ECHA dossiers, and 14 other regulatory sources
-- Every entry has a severity score (1–5), hazard category, evidence level, and source link — nothing auto-generated, each ingredient manually verified
-
-**OCR Pipeline**
-- Built two processing paths — fast path for clean/high-res images, heavy path for dark backgrounds, curved labels, low resolution, and awkward angles
-- Heavy path includes: upscaling, auto-deskew, CLAHE contrast normalisation, NLMeans denoising, Gaussian sharpening, three binarisation variants, and multi-PSM Tesseract runs
-- Scoring function picks the best result across all variants automatically
-
-**App & Search**
-- Built a canvas-based crop tool so users can isolate just the ingredients panel before OCR
-- Implemented FTS5 full-text search with prefix indexing — partial matches work, so "paraben" finds all parabens
-- Designed risk scoring, result cards, and hazard explanations pulled directly from the database
-
-**Stack**
-- Python, Streamlit, SQLite (FTS5), OpenCV, Tesseract, Pillow
+Toxic Ingredients Indicator is a Streamlit web app that analyzes cosmetic product ingredient lists and flags harmful chemicals using a curated toxicological database, dual-engine OCR, and AI-powered plain-English explanations.
 
 ---
 
-## What it actually does
+## What It Does
 
-**Three ways to scan a product:**
+Upload a label photo, paste an ingredient list, or type a single ingredient name. The app parses the input, matches it against 736 flagged cosmetic chemicals across 30 chemical families, and returns a severity-ranked safety report — no chemistry background required.
 
-- **Search** — type any ingredient name, abbreviation, or CAS number. Partial matches work — type "paraben" and you'll see all of them.
-- **Upload a photo** — take a picture of the ingredients list on your product. The app has a built-in crop tool so you can isolate just the ingredients panel, and a full OCR pipeline that handles dark backgrounds, curved labels, low resolution, and awkward angles.
-- **Paste text** — copy an ingredients list from a brand website or anywhere else, paste it in, and get an analysis instantly.
-
-**What you get back for each flagged ingredient:**
-
-- A risk level — High, Medium, or Low — based on severity scores from regulatory bodies
-- What the hazard actually is, explained in plain English (endocrine disruption, carcinogenicity, contact sensitisation, etc.)
-- Which chemical family it belongs to (parabens, phthalates, cyclic siloxanes, fragrance allergens, PFAS, etc.)
-- The specific regulatory sources that flagged it — EU Cosmetics Regulation, SCCS opinions, IARC classifications, FDA guidance, California AB 2762, ECHA dossiers — with links
+Every flagged ingredient shows its risk tier, chemical family, CAS number, one-line hazard description, regulatory source citation, and an on-demand AI explanation written in plain English.
 
 ---
-https://github.com/user-attachments/assets/907a9fe8-6f17-4d80-87cc-e92a206aad08
 
-## The database
+## Features
 
-This is the part I spent the most time on. The app is only as useful as what it knows about.
-
-The database covers 1000+ cosmetic ingredients across 30+ categories:
-
-| Category | Examples |
+| Feature | Details |
 |---|---|
-| Parabens | methylparaben, butylparaben, propylparaben |
-| Phthalates | DBP, DEHP, DEP, BBP — all 10 common ones |
-| PFAS | PFOA, PFOS, perfluorodecalin, 20+ fluorinated compounds |
-| Cyclic siloxanes | D4, D5, D6 — EU-restricted in rinse-off products |
-| Formaldehyde donors | DMDM hydantoin, quaternium-15, diazolidinyl urea, bronopol |
-| Fragrance allergens | 82 EU-listed allergens including lilial (now banned), oakmoss, galaxolide |
-| UV filters | oxybenzone, octinoxate, avobenzone, homosalate, octocrylene, and 15+ others |
-| Hair dyes | PPD, resorcinol, disperse dyes, banned oxidative dyes |
-| Heavy metals | lead, mercury, arsenic, cadmium, chromium VI, nickel |
-| Preservatives | phenoxyethanol, isothiazolinones, IPBC, chlorphenesin, all parabens |
-| Retinoids | retinol, retinyl palmitate, retinaldehyde (EU 2022 restrictions) |
-| Exfoliants/AHAs | glycolic acid, lactic acid, malic acid, salicylic acid |
-| Essential oils | 40+ oils flagged for allergens, phototoxicity, or EU restrictions |
-| Surfactants | SLS, SLES, CAPB, ALS, cocamide DEA |
-| Ethoxylated/PEG | 50+ PEG variants, all flagged for 1,4-dioxane contamination risk |
-| Skin lighteners | hydroquinone (banned EU), kojic acid, arbutin, deoxyarbutin |
-| Antioxidants | BHA (IARC 2B), BHT, TBHQ |
-| Silicones | dimethicone, phenyl trimethicone, cyclomethicone |
-| Nail care | MMA (banned), toluene sulfonamide resin, camphor |
-| Oral care | fluoride limits, chlorhexidine, hydrogen peroxide concentrations |
-
-Each entry has a severity score (1–5), a hazard category, an evidence level, and at least one regulatory source. The database draws from 20 sources including EU Annexes II/III/V/VI, SCCS opinions, IARC monographs, ECHA dossiers, FDA guidance, California AB 2762, OEHHA Prop 65, and the CSC Red List.
-
-The search uses SQLite FTS5 with prefix indexing, so "SLES", "sodium laureth", and "laureth sulfate" all find the same thing. There's also a LIKE fallback for anything FTS misses.
+| 🔍 Ingredient search | FTS5 full-text search with prefix matching and alias lookup |
+| 📋 Paste-from-label | Paste a raw ingredient list and analyze the full product |
+| 📸 Image upload | Upload a label photo and extract ingredients via OCR |
+| 🤖 Dual OCR engine | Tesseract (fast + heavy path) with Gemini Vision fallback |
+| ⚠️ Risk tiering | High / Medium / Low severity badges sorted by concern |
+| 🧬 Chemical families | 30 families including parabens, PFAS, formaldehyde donors, phthalates |
+| 📖 AI explanations | Per-ingredient plain-English explanations via Gemini 2.5 Flash |
+| 📝 AI product summary | One-paragraph safety overview of the full ingredient list |
+| ✨ OCR error correction | AI fixes garbled INCI names before analysis |
+| 🌿 Regulatory sources | EU EC 1223/2009, California AB 2762, IARC, FDA, CIR Expert Panel |
 
 ---
 
-## The OCR pipeline
+## Tech Stack
 
-Getting readable text out of a phone photo of a cosmetic label is harder than it sounds. Labels have:
-- Tiny font, often 6–8pt
-- Curved surfaces (tubes, bottles)
-- Dark or metallic backgrounds
-- Poor lighting or shadows
-- Multiple text blocks at different angles
-
-The app runs two OCR paths depending on the image:
-
-**Fast path** — for clean, well-lit, high-resolution images. Skips preprocessing entirely and runs Tesseract directly. Heavy preprocessing on already-good images makes things worse, so this path avoids it.
-
-**Heavy path** — for everything else. Steps: upscale to ~2000px tall, auto-deskew using minAreaRect rotation detection, CLAHE contrast normalisation, NLMeans denoising, Gaussian sharpening, then binarisation via three variants (Otsu, adaptive Gaussian at two block sizes, morphological cleanup). Each variant is run at multiple Tesseract PSM modes (4, 6, 11). The best result is picked by a scoring function that weighs both OCR confidence and word count.
-
-There's also a crop tool built in canvas so you can draw a box around just the ingredients section before running OCR — this alone makes a big difference on cluttered labels.
-
----
-
-## Tech stack
-
-| Layer | What's used |
-|---|---|
-| App framework | Streamlit |
-| Database | SQLite with FTS5 (full-text search with prefix indexing) |
-| OCR | Tesseract via pytesseract |
-| Image processing | OpenCV, Pillow |
-| PDF support | pdf2image + Poppler |
-| Language | Python 3.11+ |
-
-No ML model. No API calls. No internet connection required once set up. Everything runs locally.
-
----
-
-## Running it
-
-**Requirements:**
-- Python 3.11+
-- Tesseract installed on your system (`brew install tesseract` on Mac, `apt install tesseract-ocr` on Linux)
-- Poppler for PDF support (`brew install poppler` / `apt install poppler-utils`)
-
-```bash
-# Clone the repo
-git clone https://github.com/SamadritaR/Toxic-Ingredients-Indicator-for-Beauty-Products.git
-cd Toxic-Ingredients-Indicator-for-Beauty-Products
-
-# Install Python dependencies
-pip install streamlit pytesseract Pillow opencv-python pdf2image numpy
-
-# Run
-streamlit run app.py
+```
+Frontend       Streamlit
+Database       SQLite 3 + FTS5
+OCR            Tesseract 4 (pytesseract) + OpenCV + Gemini Vision
+AI             Gemini 2.5 Flash (Google Generative Language API)
+Image          Pillow, pdf2image
+Language       Python 3.11+
 ```
 
-The database file `toxic.db` needs to be in the parent directory of `app.py`, or update the `DB_PATH` variable at the top of the file to point to wherever you put it.
+---
+
+## Getting Started
+
+**1. Clone the repo**
+```bash
+git clone https://github.com/yourusername/toxic-ingredients-indicator.git
+cd toxic-ingredients-indicator
+```
+
+**2. Install dependencies**
+```bash
+pip install -r requirements.txt
+```
+
+**3. Install Tesseract**
+
+On macOS:
+```bash
+brew install tesseract
+```
+On Ubuntu/Debian:
+```bash
+sudo apt-get install tesseract-ocr
+```
+
+**4. Add your Gemini API key** *(optional — app works without it)*
+
+Create `.streamlit/secrets.toml`:
+```toml
+GEMINI_API_KEY = "your-key-here"
+```
+Get a free key at [aistudio.google.com](https://aistudio.google.com)
+
+**5. Run the app**
+```bash
+streamlit run app/app.py
+```
+
+Open `http://localhost:8501` in your browser. On the same WiFi network, any device can access it at `http://your-ip:8501`.
 
 ---
 
-## What's next
+## Project Structure
 
-A few things on the list:
-
-- **Safer alternatives** — when something is flagged, suggest what to look for instead
-- **Full product scoring** — aggregate all flagged ingredients into one overall safety score with breakdown
-- **Mobile upload improvements** — better handling of portrait-orientation phone photos
-- **Ingredient list parsing improvements** — smarter handling of parenthetical INCI names and manufacturer abbreviations
-- **Cloud deployment** — hosted version so you don't need to run it locally
-
----
-
-## Limitations
-
-The database is built from publicly available regulatory sources and is not exhaustive. New ingredients enter the market faster than any database can track them. An ingredient not flagged by this app doesn't mean it's necessarily safe — it may just not be in the database yet.
-
-This is a personal research tool, not a substitute for medical or dermatological advice. If you have a specific skin condition or allergy, talk to a doctor.
+```
+toxic-ingredients-indicator/
+│
+├── app/
+│   └── app.py               # Main Streamlit application
+│
+├── data/
+│   ├── toxic.db             # SQLite database (736 ingredients)
+│   └── seed_kb.csv          # Source data for database population
+│
+└── core/                    # Core modules
+```
 
 ---
 
-## Disclaimer
+## Database
 
-This tool is for educational purposes only.
-It is not a substitute for medical or regulatory advice. Always consult dermatologists or official authorities for health-related guidance.
+The `toxic.db` SQLite database contains:
+
+- **736 flagged cosmetic ingredients** with CAS numbers and INCI names
+- **30 chemical families** including parabens, phthalates, PFAS, benzophenones, cyclic siloxanes, isothiazolinones, fragrance allergens, formaldehyde donors, ethoxylated compounds, and hair dye precursors
+- **5 hazard severity tiers** from 0 (low concern) to 5 (known carcinogen / banned)
+- **Regulatory citations** from EU, FDA, IARC, California AB 2762, and the CIR Expert Panel
+- **Alias table** with trade names, alternate spellings, and OCR-variant forms per ingredient
+
+---
+
+## How the OCR Pipeline Works
+
+Images are routed through one of two processing paths based on detected quality:
+
+**Fast path** — clean, high-resolution, light-background images. Minimal preprocessing, PSM sweep, result in under 2 seconds.
+
+**Heavy path** — dark, blurry, curved, or compressed label photos. Applies 6 preprocessing variants (CLAHE, gamma correction, unsharp masking, contrast stretching, denoising, sharpening) across multiple Tesseract page segmentation modes. Selects the highest-scoring output using a confidence and INCI token heuristic.
+
+When Gemini Vision OCR is selected, both engines run in parallel and the higher word-count output wins.
+
+---
+
+## Regulatory Coverage
+
+| Source | Jurisdiction | Scope |
+|---|---|---|
+| EC No 1223/2009 | European Union | 1,300+ banned and restricted substances |
+| AB 2762 Toxic-Free Cosmetics Act | California, USA | 24 prohibited chemicals |
+| IARC Monographs | International | Carcinogenicity classifications Group 1 / 2A / 2B |
+| FDA Cosmetic Guidance + MoCRA | United States | Prohibited ingredients and labeling |
+| CIR Expert Panel | USA | Peer-reviewed ingredient safety assessments |
+
+---
+
+## Requirements
+
+```
+streamlit
+pytesseract
+Pillow
+opencv-python
+pdf2image
+requests
+numpy
+```
+
+Tesseract must be installed separately as a system dependency (see Getting Started above).
+
+---
+
+## Notes
+
+- The Gemini API key is optional. Without it, all four AI features are disabled but the core ingredient search, OCR, risk tiering, and source citations work fully.
+- The app is accessible on mobile browsers via local network sharing at `http://your-local-ip:8501`.
+- The database does not cover every harmful cosmetic ingredient. Ingredients not in the database return no results.
+
+---
+
+## Built By
+
+**Samadrita Roy Chowdhury**
+MS Business Analytics — California State University, East Bay
+Capstone Project, Spring 2026

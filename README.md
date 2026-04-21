@@ -279,7 +279,3 @@ GitHub: [@SamadritaR](https://github.com/SamadritaR)
 This tool is for educational and informational purposes only. It is not a substitute for medical, dermatological, or regulatory advice. Always consult qualified professionals or official regulatory authorities for health related guidance. Ingredients not flagged by the system are not guaranteed to be safe; they may simply be outside the current database coverage.
 
 ---
-
-## License
-
-This project is released under the MIT License. See `LICENSE` for details. The underlying open source dependencies (Streamlit, Tesseract, OpenCV, Pillow, pdf2image, SQLite, requests, NumPy) are used in accordance with their respective licenses.

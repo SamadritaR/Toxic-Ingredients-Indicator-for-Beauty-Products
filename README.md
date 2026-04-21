@@ -2,9 +2,9 @@
 
 > **Scan a cosmetic label. Know what's in it. In plain English.**
 
-Most people have no idea what's actually in their skincare, haircare, or makeup products. Ingredient lists are long, written in Latin chemical nomenclature, and deliberately opaque. Parabens, formaldehyde-releasing preservatives, PFAS compounds, phthalates, and benzophenones appear in everyday products — yet nothing on the label tells you they're there or why they matter.
+Most people have no idea what's actually in their skincare, haircare, or makeup products. Ingredient lists are long, written in Latin chemical nomenclature, and deliberately opaque. Parabens, formaldehyde-releasing preservatives, PFAS compounds, phthalates, and benzophenones appear in everyday products - yet nothing on the label tells you they're there or why they matter.
 
-The **Toxic Ingredients Indicator** bridges that gap. It lets anyone — regardless of scientific background — upload a label photo, paste an ingredient list, or type a chemical name, and instantly receive a structured safety report: every flagged ingredient ranked by severity, explained in plain English, and cited back to the actual regulation or study that flagged it.
+The **Toxic Ingredients Indicator** bridges that gap. It lets anyone - regardless of scientific background — upload a label photo, paste an ingredient list, or type a chemical name, and instantly receive a structured safety report: every flagged ingredient ranked by severity, explained in plain English, and cited back to the actual regulation or study that flagged it.
 
 ---
 

@@ -25,6 +25,10 @@ This app is the first to combine:
 
 ## How It Works
 
+
+https://github.com/user-attachments/assets/56d71239-87b0-4ea8-9b9d-9ed41e18d0a9
+
+
 ### Input Layer
 
 The app accepts three input modes:

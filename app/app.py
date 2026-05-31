@@ -369,7 +369,11 @@ def gemini_product_summary(flagged: list[dict]) -> str:
 # OCR helpers
 # --------------------------------
 
-import cv2, numpy as np
+try:
+    import cv2, numpy as np
+except ImportError:
+    cv2 = None
+    np = None
 
 
 def _gamma(img, g=0.4):

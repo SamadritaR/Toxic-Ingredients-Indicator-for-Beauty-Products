@@ -233,13 +233,21 @@ def sources_inline(hz: list[dict]) -> str:
 # Gemini API helpers
 # --------------------------------
 
-GEMINI_MODEL = "gemini-2.5-flash"
+GEMINI_MODEL = "gemini-2.5-flash-lite"
 
 def _gemini_key() -> str:
+    # 1. Local dev: read from secrets.toml
     try:
-        return st.secrets.get("GEMINI_API_KEY", "") or os.environ.get("GEMINI_API_KEY", "")
+        key = st.secrets.get("GEMINI_API_KEY", "") or os.environ.get("GEMINI_API_KEY", "")
+        if key:
+            return key
     except Exception:
-        return os.environ.get("GEMINI_API_KEY", "")
+        key = os.environ.get("GEMINI_API_KEY", "")
+        if key:
+            return key
+
+    # 2. Deployed: read from session state (user-provided)
+    return st.session_state.get("_user_gemini_key", "")
 
 
 def _gemini_call(prompt: str, max_tokens: int = 500, image_b64: str = None,
@@ -658,6 +666,25 @@ ensure_fts_prefix()
 
 with st.sidebar:
     st.header("Input")
+
+    # Show API key input only when not available via secrets/env (i.e. on deployed app)
+    _has_builtin_key = bool(_gemini_key())
+    if not _has_builtin_key:
+        st.markdown("**Gemini API Key**")
+        user_key = st.text_input(
+            "Enter your Gemini API key",
+            type="password",
+            placeholder="AIza...",
+            help="Required for AI features (OCR correction, explanations, product summary). Free at aistudio.google.com",
+            key="_gemini_key_input"
+        )
+        if user_key:
+            st.session_state["_user_gemini_key"] = user_key
+            st.success("Key saved for this session")
+        else:
+            st.info("Get a free key at [aistudio.google.com](https://aistudio.google.com)")
+        st.divider()
+
     mode = st.radio("Choose input type:", ["Search text", "Upload image"], index=0)
     if pytesseract is None or Image is None:
         st.caption("For OCR: install `pytesseract` and `Pillow` in your venv.")

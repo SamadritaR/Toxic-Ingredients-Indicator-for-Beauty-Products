@@ -4,7 +4,7 @@ An AI powered Streamlit app that turns a cosmetic product label into a plain Eng
 
 Built as the Applied Research Project for the MS in Business Analytics at California State University, East Bay.
 
-🔗 **[Live App → Toxic Ingredients Indicator](https://toxic-ingredients-indicator-for-beauty-appucts-u8r8keqe3xdc2n4.streamlit.app/)
+[![Streamlit](https://img.shields.io/badge/Streamlit-Live%20App-FF4B4B?style=for-the-badge&logo=streamlit&logoColor=white)](https://toxic-ingredients-indicator-for-beauty-appucts-u8r8keqe3xdc2n4.streamlit.app/)
 
 ---
 
